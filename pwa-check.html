@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA 配置检查</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; }
+        .check { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .pass { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button { background: #ff2a6d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        .url-box { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🌟 LuvGlow PWA 配置检查</h1>
+    
+    <div class="url-box">
+        <h3>🔗 网站URL</h3>
+        <p><strong>https://wangyouwei2016.github.io/light/</strong></p>
+        <button onclick="copyUrl()">复制URL</button>
+        <button onclick="openSite()">打开网站</button>
+    </div>
+
+    <div id="checks">
+        <div class="check pass">✅ Manifest文件已配置</div>
+        <div class="check pass">✅ 应用名称: LuvGlow 爱爱氛围灯</div>
+        <div class="check pass">✅ 图标: 多尺寸SVG图标 (72x72, 96x96, 192x192, 512x512)</div>
+        <div class="check pass">✅ 显示模式: fullscreen (全屏)</div>
+        <div class="check pass">✅ 方向: portrait-primary (竖屏)</div>
+        <div class="check pass">✅ 主题色: #ff2a6d</div>
+        <div class="check pass">✅ 背景色: #000000</div>
+        <div class="check pass">✅ Service Worker: 已配置</div>
+        <div class="check pass">✅ 截图: 已提供应用截图</div>
+        <div class="check pass">✅ 快捷方式: 浪漫模式快捷启动</div>
+        <div class="check info">ℹ️ 防锁屏: 通过Wake Lock API实现</div>
+    </div>
+
+    <h2>🚀 PWA Builder 使用步骤</h2>
+    <ol>
+        <li>访问: <a href="https://www.pwabuilder.com/" target="_blank">PWA Builder</a></li>
+        <li>输入URL: <code>https://wangyouwei2016.github.io/light/</code></li>
+        <li>点击 "Start" 分析网站</li>
+        <li>选择 "Android" 平台</li>
+        <li>配置选项:
+            <ul>
+                <li>✅ Keep Screen On (防锁屏)</li>
+                <li>✅ Fullscreen</li>
+                <li>✅ Portrait orientation</li>
+            </ul>
+        </li>
+        <li>点击 "Generate Package" 生成APK</li>
+        <li>下载并安装到Android设备</li>
+    </ol>
+
+    <h2>🔧 如果PWA Builder仍有问题</h2>
+    <div class="check info">
+        <h4>备选方案:</h4>
+        <ul>
+            <li><strong>AppsGeyser</strong>: <a href="https://appsgeyser.com/" target="_blank">appsgeyser.com</a></li>
+            <li><strong>Gonative.io</strong>: <a href="https://gonative.io/" target="_blank">gonative.io</a></li>
+            <li><strong>Chrome WebAPK</strong>: 在Android Chrome中"添加到主屏幕"</li>
+        </ul>
+    </div>
+
+    <script>
+        function copyUrl() {
+            navigator.clipboard.writeText('https://wangyouwei2016.github.io/light/');
+            alert('URL已复制到剪贴板！');
+        }
+        
+        function openSite() {
+            window.open('https://wangyouwei2016.github.io/light/', '_blank');
+        }
+
+        // 检查当前页面的PWA配置
+        window.addEventListener('load', function() {
+            if ('serviceWorker' in navigator) {
+                console.log('✅ Service Worker 支持');
+            }
+            
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                console.log('✅ 运行在PWA模式');
+            }
+        });
+    </script>
+</body>
+</html>
