@@ -1,4 +1,10 @@
 <!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><title>LuvGlow 爱爱氛围灯</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff2a6d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LuvGlow">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9InVybCgjZ3JhZGllbnQwX2xpbmVhcl8xXzEpIi8+CjxwYXRoIGQ9Ik05NiA0OEM4MS45MDg2IDQ4IDcwLjUgNTkuNDA4NiA3MC41IDczLjVDNzAuNSA4Ny41OTE0IDgxLjkwODYgOTkgOTYgOTlDMTEwLjA5MSA5OSAxMjEuNSA4Ny41OTE0IDEyMS41IDczLjVDMTIxLjUgNTkuNDA4NiAxMTAuMDkxIDQ4IDk2IDQ4WiIgZmlsbD0iI0ZGRkZGRiIgZmlsbC1vcGFjaXR5PSIwLjkiLz4KPHA+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9ImdyYWRpZW50MF9saW5lYXJfMV8xIiB4MT0iMCIgeTE9IjAiIHgyPSIxOTIiIHkyPSIxOTIiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KPHN0b3Agc3RvcC1jb2xvcj0iI0ZGMkE2RCIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM4QTJCRTIiLz4KPC9saW5lYXJHcmFkaWVudD4KPC9kZWZzPgo8L3N2Zz4K">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;overflow:hidden;height:100vh}
@@ -60,7 +66,65 @@ body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Se
 </div>
 
 <script>
-console.log('LuvGlow v1.0 - H5 套壳就绪');
+console.log('LuvGlow v1.0 - PWA版本就绪');
+
+// PWA 安装和防锁屏功能
+let wakeLock = null;
+
+// 防锁屏功能
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+      console.log('屏幕保持唤醒已启用');
+      
+      wakeLock.addEventListener('release', () => {
+        console.log('屏幕保持唤醒已释放');
+      });
+    } else {
+      console.log('此设备不支持Wake Lock API');
+    }
+  } catch (err) {
+    console.error('无法启用屏幕保持唤醒:', err);
+  }
+}
+
+// 页面可见性变化时重新请求wake lock
+document.addEventListener('visibilitychange', async () => {
+  if (wakeLock !== null && document.visibilityState === 'visible') {
+    await requestWakeLock();
+  }
+});
+
+// PWA 安装提示
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  
+  // 显示安装提示（可选）
+  console.log('PWA可以安装');
+});
+
+// 用户交互后启用防锁屏
+document.addEventListener('click', async () => {
+  if (wakeLock === null) {
+    await requestWakeLock();
+  }
+}, { once: true });
+
+// 注册Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then((registration) => {
+        console.log('SW registered: ', registration);
+      })
+      .catch((registrationError) => {
+        console.log('SW registration failed: ', registrationError);
+      });
+  });
+}
 
 // Canvas setup
 const canvas = document.getElementById('canvas');
