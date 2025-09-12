@@ -1,4 +1,4 @@
-const CACHE_NAME = 'luvglow-v1.0';
+const CACHE_NAME = 'luvglow-v1.1';
 const urlsToCache = [
   '/light/',
   '/light/index.html',
