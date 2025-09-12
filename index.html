@@ -17,8 +17,8 @@ body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Se
 .btn{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.8);border:none;padding:10px;border-radius:12px;font-size:11px;cursor:pointer;backdrop-filter:blur(10px);transition:all 0.3s ease;font-weight:500;min-width:45px;height:45px;display:flex;align-items:center;justify-content:center;text-align:center}
 .btn.active{background:#ff2a6d;color:#fff}
 .btn:active{transform:scale(0.95)}
-.timer-btn{min-width:100px;font-size:12px;flex-direction:column;padding:8px;background:linear-gradient(135deg,rgba(255,42,109,0.3),rgba(138,43,226,0.3));border:1px solid rgba(255,42,109,0.5)}
-.timer-btn.active{background:linear-gradient(135deg,#ff2a6d,#8a2be2);animation:pulse 2s infinite}
+.timer-btn{min-width:100px;font-size:12px;flex-direction:column;padding:8px;background:linear-gradient(135deg,rgba(255,42,109,0.3),rgba(138,43,226,0.3));border:1px solid rgba(255,42,109,0.5);border-radius:12px}
+.timer-btn.active{background:linear-gradient(135deg,#ff2a6d,#8a2be2);animation:pulse 2s infinite;border-radius:12px}
 .timer-text{font-size:10px;opacity:0.8;margin-bottom:2px}
 .timer-time{font-size:14px;font-weight:600;color:#fff;text-shadow:0 0 10px rgba(255,42,109,0.8)}
 @keyframes pulse{0%,100%{box-shadow:0 0 15px rgba(255,42,109,0.5)}50%{box-shadow:0 0 25px rgba(255,42,109,0.8)}}
@@ -62,6 +62,15 @@ body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Se
     <h3>日历记录</h3>
     <div class="calendar" id="calendar"></div>
     <button class="modal-btn" id="calendarClose">关闭</button>
+  </div>
+</div>
+
+<div class="modal" id="dateDetailModal">
+  <div class="modal-content">
+    <div id="dateDetailText"></div>
+    <button class="modal-btn" id="dateDetailBack">返回</button>
+    <button class="modal-btn" id="dateDetailClose">关闭</button>
+    <button class="modal-btn" id="dateDetailDelete" style="display:none">删除</button>
   </div>
 </div>
 
@@ -152,16 +161,16 @@ const modes = {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   },
   passion: () => {
-    const time = Date.now() * 0.003;
+    const time = Date.now() * 0.0005;
     const pulse = (Math.sin(time) + 1) / 2;
-    const intensity = 0.3 + pulse * 0.4;
+    const intensity = 0.3 + pulse * 0.2;
     ctx.fillStyle = `rgba(255, 69, 0, ${intensity})`;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   },
   mystery: () => {
     const time = Date.now() * 0.0005;
     const breath = (Math.sin(time) + 1) / 2;
-    ctx.fillStyle = `rgba(25, 25, 112, ${0.15 + breath * 0.35})`;
+    ctx.fillStyle = `rgba(70, 130, 180, ${0.35 + breath * 0.25})`;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   },
   nature: () => {
@@ -416,30 +425,31 @@ async function generateCalendar() {
       const hasRecord = luvDates.includes(dateStr);
       const savedTime = calendarData.luvTimes[dateStr];
       
-      if (hasRecord && savedTime) {
-        showModal(`${dateStr}\n时长: ${savedTime}`, async () => {
+      // 关闭日历弹窗
+      document.getElementById('calendarModal').style.display = 'none';
+      
+      document.getElementById('dateDetailText').textContent = hasRecord && savedTime 
+        ? `${dateStr}\n计时结果: ${savedTime}` 
+        : hasRecord 
+        ? `${dateStr}\n有记录但无计时数据`
+        : `${dateStr}\n无记录`;
+      
+      const deleteBtn = document.getElementById('dateDetailDelete');
+      if (hasRecord) {
+        deleteBtn.style.display = 'inline-block';
+        deleteBtn.onclick = async () => {
           let newDates = luvDates.filter(d => d !== dateStr);
           delete calendarData.luvTimes[dateStr];
           delete calendarData.luvDurations[dateStr];
           await saveLuvDates(newDates);
           generateCalendar();
-          hideModal();
-        });
-      } else if (hasRecord) {
-        showModal(`删除记录 ${dateStr}?`, async () => {
-          let newDates = luvDates.filter(d => d !== dateStr);
-          await saveLuvDates(newDates);
-          generateCalendar();
-          hideModal();
-        });
+          document.getElementById('dateDetailModal').style.display = 'none';
+        };
       } else {
-        showModal(`添加记录 ${dateStr}?`, async () => {
-          const newDates = [...luvDates, dateStr];
-          await saveLuvDates(newDates);
-          generateCalendar();
-          hideModal();
-        });
+        deleteBtn.style.display = 'none';
       }
+      
+      document.getElementById('dateDetailModal').style.display = 'flex';
     });
     
     calendar.appendChild(dayEl);
@@ -455,12 +465,22 @@ document.getElementById('calendarClose').addEventListener('click', () => {
   document.getElementById('calendarModal').style.display = 'none';
 });
 
+document.getElementById('dateDetailClose').addEventListener('click', () => {
+  document.getElementById('dateDetailModal').style.display = 'none';
+});
+
+document.getElementById('dateDetailBack').addEventListener('click', () => {
+  document.getElementById('dateDetailModal').style.display = 'none';
+  document.getElementById('calendarModal').style.display = 'flex';
+});
+
 // Modal functionality
 function showModal(text, action = null) {
   document.getElementById('modalText').textContent = text;
   const actionBtn = document.getElementById('modalAction');
   if (action) {
     actionBtn.style.display = 'inline-block';
+    actionBtn.textContent = '删除';
     actionBtn.onclick = action;
   } else {
     actionBtn.style.display = 'none';
