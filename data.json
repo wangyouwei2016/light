@@ -1,11 +1,5 @@
 {
-  "luvDates": [
-    "2025-09-12"
-  ],
-  "luvTimes": {
-    "2025-09-12": "00:02"
-  },
-  "luvDurations": {
-    "2025-09-12": "2"
-  }
+  "luvDates": [],
+  "luvTimes": {},
+  "luvDurations": {}
 }
